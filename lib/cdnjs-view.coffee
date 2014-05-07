@@ -3,7 +3,7 @@
 module.exports =
 class CdnjsView extends View
   @content: ->
-    @div class: 'cdnjs overlay from-top', =>
+    @div class: 'cdnjs command-palette overlay from-top', =>
       @div "The Cdnjs package is Alive! It's ALIVE!", class: "message"
 
   initialize: (serializeState) ->
