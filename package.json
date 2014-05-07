@@ -1,14 +1,15 @@
 {
   "name": "cdnjs",
   "main": "./lib/cdnjs",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Easily embed scripts from cdnjs",
-  "activationEvents": ["cdnjs:convert"],
+  "activationEvents": [
+    "cdnjs:convert"
+  ],
   "repository": "https://github.com/cdnjs/atom-extension",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
