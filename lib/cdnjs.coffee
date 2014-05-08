@@ -7,22 +7,21 @@ module.exports =
   activate: (state) ->
     @cdnjsView = new CdnjsView(state.cdnjsViewState)
     atom.workspaceView.command "cdnjs:convert", => @convert()
-    #atom.workspaceView.command "cdnjs:togglea", => cdnjsView.toggle()
-    console.log 'asdas'
+    atom.workspaceView.command "cdnjs:GetUrl", => @GetUrl()
+    atom.workspaceView.command "cdnjs:GetScriptTag", => @GetScriptTag()
+    atom.workspaceView.command "cdnjs:GetLinkTag", => @GetLinkTag()
 
-  convert: ->
-    editor = atom.workspace.activePaneItem
+  url: ->
     @cdnjsView.toggle()
-    return false
-    request.get "http://api.cdnjs.com/libraries", (res) ->
-      if res.body.results
-        libraries = res.body.results
-        editor.insertText JSON.stringify(libraries[0])
 
-      else
-        #throw error
+  GetUrl: ->
+    @cdnjsView.toggle()
 
-      return
+  GetScriptTag: ->
+    @cdnjsView.toggle()
+
+  GetLinkTag: ->
+    @cdnjsView.toggle()
 
   deactivate: ->
     @cdnjsView.destroy()

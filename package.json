@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "description": "Easily embed scripts from cdnjs",
   "activationEvents": [
-    "cdnjs:convert"
+    "cdnjs:GetUrl"
   ],
   "repository": "https://github.com/cdnjs/atom-extension",
   "license": "MIT",

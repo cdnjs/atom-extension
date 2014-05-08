@@ -45,10 +45,48 @@ class CdnjsView extends SelectListView
             @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
         @span eventDescription, title: eventName
 
-  confirmed: ({eventName}) ->
-    @cancel()
-    @eventElement.trigger(eventName)
+  confirmed: ({eventName, eventDescription}) ->
+    #@cancel()
+    @filterEditorView.getEditor().setText('')
 
+    @setItems([])
+    if eventName == 'version'
+      @libraryVersion = eventDescription
+      assets = _.filter @library.assets, (asset) ->
+        if asset.version == eventDescription
+          return true
+
+      assets = assets[0].files
+      files = []
+      _.each assets, (file) ->
+        files.push {eventName: 'file', eventDescription: file}
+      @setItems(files)
+    else if eventName == 'file'
+      editor = atom.workspace.activePaneItem
+      url = '//cdnjs.cloudflare.com/ajax/libs/' + @library.name + '/' + @libraryVersion + '/' + eventDescription
+      editor.insertText(url)
+      @cancel()
+    else
+      request.get "http://api.cdnjs.com/libraries/" + eventDescription, (res) =>
+
+        if res.body
+          @library = res.body
+          library = res.body
+          versions = []
+          _.each library.assets, (asset) ->
+            versions.push
+              eventDescription: asset.version
+              eventName: 'version'
+
+            return
+
+          @setItems(versions)
+
+        else
+          #throw error
+
+        return
+    #@eventElement.trigger(eventName)
   attach: ->
     @storeFocusedElement()
 
@@ -57,15 +95,14 @@ class CdnjsView extends SelectListView
     else
       @eventElement = atom.workspaceView
     @keyBindings = atom.keymap.findKeyBindings(target: @eventElement[0])
-
-    events = [{eventDescription: 'asdas', eventName: 'asdawewe'}]
-    request.get "http://api.cdnjs.com/libraries", (res) =>
+    events = []
+    request.get "http://api.cdnjs.com/libraries?atom", (res) =>
       if res.body.results
         libraries = res.body.results
         _.each libraries, (library) ->
           events.push
             eventDescription: library.name
-            eventName: library.name
+            eventName: library.latest
 
           return
 
