@@ -1,5 +1,5 @@
-# cdnjs package
+# cdnjs atom extension
 
-A short description of your package.
+Quickly embed url's from the large collection of client side libraries at cdnjs.com
 
-![A screenshot of your spankin' package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+Simply bring up the command window and type cdnjs to run the GetUrl method
