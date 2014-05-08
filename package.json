@@ -12,6 +12,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "superagent": "^0.18.0"
+    "superagent": "^0.18.0",
+    "underscore-plus": "^1.2.1"
   }
 }
