@@ -96,21 +96,34 @@ class CdnjsView extends SelectListView
       @eventElement = atom.workspaceView
     @keyBindings = atom.keymap.findKeyBindings(target: @eventElement[0])
     events = []
-    request.get "http://api.cdnjs.com/libraries?atom", (res) =>
-      if res.body.results
-        libraries = res.body.results
-        _.each libraries, (library) ->
-          events.push
-            eventDescription: library.name
-            eventName: library.latest
+    if @libraries
+      _.each @libraries, (library) ->
+        events.push
+          eventDescription: library.name
+          eventName: library.latest
 
-          return
+        return
 
-        @setItems(events)
+      @setItems(events)
 
-        atom.workspaceView.append(this)
-        @focusFilterEditor()
-      else
-        #throw error
+      atom.workspaceView.append(this)
+      @focusFilterEditor()
+    else
+      request.get "http://api.cdnjs.com/libraries?atom", (res) =>
+        if res.body.results
+          @libraries = res.body.results
+          _.each @libraries, (library) ->
+            events.push
+              eventDescription: library.name
+              eventName: library.latest
 
-      return
+            return
+
+          @setItems(events)
+
+          atom.workspaceView.append(this)
+          @focusFilterEditor()
+        else
+          #throw error
+
+        return
