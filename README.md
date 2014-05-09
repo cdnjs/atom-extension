@@ -4,7 +4,12 @@ Quickly embed url's from the large collection of client side libraries at cdnjs.
 
 Simply bring up the command window and type cdnjs to run the GetUrl method
 
-![screenshot](http://i.imgur.com/B0sHInO.png)
+### Insert cdnjs urls from inside the editor
+
+![screenshot](https://cdn.rawgit.com/cdnjs/atom-extension/master/screenshots/geturl.gif)
+
+### Download files straight into your project
+![screenshot](https://cdn.rawgit.com/cdnjs/atom-extension/master/screenshots/downloadfile.gif)
 
 ## Features
 
