@@ -1,6 +1,8 @@
 {View} = require 'atom'
 _ = require 'underscore-plus'
+fs = require 'fs'
 {$, $$, SelectListView} = require 'atom'
+wget = require 'wget'
 
 request = require 'superagent'
 module.exports =
@@ -24,7 +26,12 @@ class CdnjsView extends SelectListView
     @detach()
   getFilterKey: ->
     'eventDescription'
-  toggle: ->
+  toggle: (options = {}) ->
+    @action = options.action || ''
+    if @action == 'download'
+      list = $('.tree-view-scroller')
+      selectedEntry = list.find('.selected')?.view()
+      @selectedPath = selectedEntry.getPath()
 
     if @hasParent()
       @cancel()
@@ -64,7 +71,23 @@ class CdnjsView extends SelectListView
     else if eventName == 'file'
       editor = atom.workspace.activePaneItem
       url = '//cdnjs.cloudflare.com/ajax/libs/' + @library.name + '/' + @libraryVersion + '/' + eventDescription
-      editor.insertText(url)
+      if @action == 'download'
+        filePath = eventDescription.split('/')
+        filePath = filePath[filePath.length-1]
+        download = wget.download('http:' + url, @selectedPath + "/" + filePath, {})
+        download.on "end", (output) ->
+          console.log output
+          return
+
+        #request.get('http:' + url).set("Accept", "text/plain").end (error, res) =>
+          #console.log res
+          #fs.writeFile @selectedPath + "/" + eventDescription, res.text, 'utf8', (err) ->
+
+            #throw err  if err
+            #console.log "It's saved!"
+            #return
+      else
+        editor.insertText(url)
       @cancel()
     else
       request.get "http://api.cdnjs.com/libraries/" + eventDescription, (res) =>

@@ -4,7 +4,8 @@
   "version": "1.1.0",
   "description": "Easily embed scripts from cdnjs",
   "activationEvents": [
-    "cdnjs:GetUrl"
+    "cdnjs:GetUrl",
+    "cdnjs:DownloadFile"
   ],
   "repository": "https://github.com/cdnjs/atom-extension",
   "license": "MIT",
@@ -13,6 +14,7 @@
   },
   "dependencies": {
     "superagent": "^0.18.0",
-    "underscore-plus": "^1.2.1"
+    "underscore-plus": "^1.2.1",
+    "wget": "0.0.1"
   }
 }
