@@ -66,7 +66,7 @@ class CdnjsView extends SelectListView
       assets = assets[0].files
       files = []
       _.each assets, (file) ->
-        files.push {eventName: 'file', eventDescription: file}
+        files.push {eventName: 'file', eventDescription: file.name}
       @setItems(files)
     else if eventName == 'file'
       editor = atom.workspace.activePaneItem
