@@ -30,7 +30,7 @@ class CdnjsView extends SelectListView
     if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
       @eventElement = @previouslyFocusedElement
     else
-      @eventElement = atom.workspaceView
+      @eventElement = atom.views.getView(atom.workspace)
 
     @keyBindings = atom.keymaps.findKeyBindings(target: @eventElement[0])
 
