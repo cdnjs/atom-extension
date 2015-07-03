@@ -6,13 +6,12 @@ module.exports =
 
   activate: (state) ->
     @cdnjsView = new CdnjsView(state.cdnjsViewState)
-    atom.workspaceView.command "cdnjs:convert", => @convert()
-
-    atom.workspaceView.command "cdnjs:GetUrl", => @GetUrl()
-
-    atom.workspaceView.command "cdnjs:DownloadFile", => @DownloadFile()
-    atom.workspaceView.command "cdnjs:GetScriptTag", => @GetScriptTag()
-    atom.workspaceView.command "cdnjs:GetLinkTag", => @GetLinkTag()
+    atom.commands.add "atom-workspace",
+      "cdnjs:convert": => @convert()
+      "cdnjs:GetUrl": => @GetUrl()
+      "cdnjs:DownloadFile": => @DownloadFile()
+      "cdnjs:GetScriptTag": => @GetScriptTag()
+      "cdnjs:GetLinkTag": => @GetLinkTag()
 
   url: ->
     @cdnjsView.toggle()

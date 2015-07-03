@@ -1,7 +1,6 @@
-{View} = require 'atom'
 _ = require 'underscore-plus'
 fs = require 'fs'
-{$, $$, SelectListView} = require 'atom'
+{$, $$, View, SelectListView} = require 'atom-space-pen-views'
 wget = require 'wget'
 
 request = require 'superagent'
@@ -16,16 +15,58 @@ class CdnjsView extends SelectListView
   initialize: ->
     super
 
-    @addClass('command-palette overlay from-top')
+    @addClass('overlay from-top')
+    @getLibraries()
+  
+  destroy: ->
+    @detach()
 
+  getLibraries: ->
+    events = []
+
+    @setLoading('Please wait...')
+    @storeFocusedElement()
+
+    if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
+      @eventElement = @previouslyFocusedElement
+    else
+      @eventElement = atom.workspaceView
+
+    @keyBindings = atom.keymaps.findKeyBindings(target: @eventElement[0])
+
+    if @libraries
+      _.each @libraries, (library) ->
+        events.push
+          eventDescription: library.name
+          eventName: library.latest
+
+        return
+
+      @setItems(events)
+      @show()
+    else
+      request.get "http://api.cdnjs.com/libraries?atom", (res) =>
+        if res.body.results
+          @libraries = res.body.results
+          _.each @libraries, (library) ->
+            events.push
+              eventDescription: library.name
+              eventName: library.latest
+
+            return
+
+          @setItems(events)
+          @show()
+        else
+          #throw error
+
+        return
 
   serialize: ->
 
-  # Tear down any state and detach
-  destroy: ->
-    @detach()
   getFilterKey: ->
     'eventDescription'
+  
   toggle: (options = {}) ->
     @action = options.action || ''
     if @action == 'download'
@@ -34,14 +75,20 @@ class CdnjsView extends SelectListView
       @selectedPath = selectedEntry.getPath()
 
     if @hasParent()
-      @cancel()
-    else
-      @attach()
-    #console.log "CdnjsView was toggled!"
-    #if @hasParent()
-      #@detach()
-    #else
-      #atom.workspaceView.append(this)
+      @getLibraries()
+
+    if !@panel?.isVisible()
+      @show()
+
+  show: ->
+    @panel ?= atom.workspace.addModalPanel(item: this)
+    @panel.show()
+
+    @storeFocusedElement()
+    @focusFilterEditor()
+
+  hide: ->
+    @panel?.hide()
 
   viewForItem: ({eventName, eventDescription}) ->
     keyBindings = @keyBindings
@@ -52,11 +99,16 @@ class CdnjsView extends SelectListView
             @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
         @span eventDescription, title: eventName
 
-  confirmed: ({eventName, eventDescription}) ->
-    #@cancel()
-    @filterEditorView.getEditor().setText('')
+  cancelled: ->
+    @hide()
 
-    @setItems([])
+  confirmed: ({eventName, eventDescription}) ->
+    @cancel()
+    @setLoading('Please wait...')
+    @show()
+    
+    editor = atom.workspace.getActiveTextEditor()
+
     if eventName == 'version'
       @libraryVersion = eventDescription
       assets = _.filter @library.assets, (asset) ->
@@ -68,8 +120,8 @@ class CdnjsView extends SelectListView
       _.each assets, (file) ->
         files.push {eventName: 'file', eventDescription: file.name}
       @setItems(files)
+      @setLoading()
     else if eventName == 'file'
-      editor = atom.workspace.activePaneItem
       url = '//cdnjs.cloudflare.com/ajax/libs/' + @library.name + '/' + @libraryVersion + '/' + eventDescription
       if @action == 'download'
         filePath = eventDescription.split('/')
@@ -88,7 +140,7 @@ class CdnjsView extends SelectListView
             #return
       else
         editor.insertText(url)
-      @cancel()
+        @cancel()
     else
       request.get "http://api.cdnjs.com/libraries/" + eventDescription, (res) =>
 
@@ -104,49 +156,10 @@ class CdnjsView extends SelectListView
             return
 
           @setItems(versions)
+          @setLoading()
 
         else
           #throw error
 
         return
     #@eventElement.trigger(eventName)
-  attach: ->
-    @storeFocusedElement()
-
-    if @previouslyFocusedElement[0] and @previouslyFocusedElement[0] isnt document.body
-      @eventElement = @previouslyFocusedElement
-    else
-      @eventElement = atom.workspaceView
-    @keyBindings = atom.keymap.findKeyBindings(target: @eventElement[0])
-    events = []
-    if @libraries
-      _.each @libraries, (library) ->
-        events.push
-          eventDescription: library.name
-          eventName: library.latest
-
-        return
-
-      @setItems(events)
-
-      atom.workspaceView.append(this)
-      @focusFilterEditor()
-    else
-      request.get "http://api.cdnjs.com/libraries?atom", (res) =>
-        if res.body.results
-          @libraries = res.body.results
-          _.each @libraries, (library) ->
-            events.push
-              eventDescription: library.name
-              eventName: library.latest
-
-            return
-
-          @setItems(events)
-
-          atom.workspaceView.append(this)
-          @focusFilterEditor()
-        else
-          #throw error
-
-        return
