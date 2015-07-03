@@ -15,3 +15,8 @@ Simply bring up the command window and type cdnjs to run the GetUrl method
 
 * Insert any url into your current file
 * Right click in your tree, to download any file from cdnjs into your project
+
+
+### Contributors
+
+- [Jonathan Andres](https://github.com/ksprwhite)
