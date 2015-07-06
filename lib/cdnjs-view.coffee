@@ -2,6 +2,7 @@ _ = require 'underscore-plus'
 fs = require 'fs'
 {$, $$, View, SelectListView} = require 'atom-space-pen-views'
 wget = require 'wget'
+path = require 'path'
 
 request = require 'superagent'
 module.exports =
@@ -17,7 +18,7 @@ class CdnjsView extends SelectListView
     super
 
     @addClass('overlay from-top')
-  
+
   destroy: ->
     @detach()
 
@@ -65,14 +66,15 @@ class CdnjsView extends SelectListView
 
   getFilterKey: ->
     'eventDescription'
-  
+
   toggle: (options = {}) ->
 
     @action = options.action || ''
     if @action == 'download'
       list = $('.tree-view-scroller')
-      selectedEntry = list.find('.selected')
-      @selectedPath = selectedEntry[0].directory.path
+      selectedEntry = list.find('.selected')[0]
+      entryEntity = selectedEntry.file || selectedEntry.directory
+      @selectedPath = if selectedEntry.file then path.dirname(entryEntity.path) else entryEntity.path
 
     if !@libraries
       @getLibraries()
@@ -109,7 +111,7 @@ class CdnjsView extends SelectListView
     @cancel()
     @setLoading('Please wait...')
     @show()
-    
+
     editor = atom.workspace.getActiveTextEditor()
 
     if eventName == 'version'
@@ -130,7 +132,7 @@ class CdnjsView extends SelectListView
         filePath = eventDescription.split('/')
         filePath = filePath[filePath.length-1]
         download = wget.download('http:' + url, @selectedPath + "/" + filePath, {})
-        
+
         download.on "end", (output) =>
 
           # show notification
