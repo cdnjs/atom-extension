@@ -11,12 +11,12 @@ class CdnjsView extends SelectListView
     new CdnjsView
 
   keyBindings: null
+  libraries: null
 
   initialize: ->
     super
 
     @addClass('overlay from-top')
-    @getLibraries()
   
   destroy: ->
     @detach()
@@ -43,12 +43,11 @@ class CdnjsView extends SelectListView
         return
 
       @setItems(events)
-      @show()
     else
       request.get "http://api.cdnjs.com/libraries?atom", (res) =>
         if res.body.results
-          @libraries = res.body.results
-          _.each @libraries, (library) ->
+          libraries = res.body.results
+          _.each libraries, (library) ->
             events.push
               eventDescription: library.name
               eventName: library.latest
@@ -56,7 +55,7 @@ class CdnjsView extends SelectListView
             return
 
           @setItems(events)
-          @show()
+          @libraries = events
         else
           #throw error
 
@@ -68,14 +67,17 @@ class CdnjsView extends SelectListView
     'eventDescription'
   
   toggle: (options = {}) ->
+
     @action = options.action || ''
     if @action == 'download'
       list = $('.tree-view-scroller')
-      selectedEntry = list.find('.selected')?.view()
-      @selectedPath = selectedEntry.getPath()
+      selectedEntry = list.find('.selected')
+      @selectedPath = selectedEntry[0].directory.path
 
-    if @hasParent()
+    if !@libraries
       @getLibraries()
+    else
+      @setItems(@libraries)
 
     if !@panel?.isVisible()
       @show()
@@ -100,6 +102,7 @@ class CdnjsView extends SelectListView
         @span eventDescription, title: eventName
 
   cancelled: ->
+    @setItems([])
     @hide()
 
   confirmed: ({eventName, eventDescription}) ->
@@ -127,17 +130,17 @@ class CdnjsView extends SelectListView
         filePath = eventDescription.split('/')
         filePath = filePath[filePath.length-1]
         download = wget.download('http:' + url, @selectedPath + "/" + filePath, {})
-        download.on "end", (output) ->
-          console.log output
+        
+        download.on "end", (output) =>
+
+          # show notification
+          atom.notifications.addSuccess 'library successfully downloaded',
+            detail: "#{@library.name} #{@libraryVersion}"
+
+          # close panel
+          @cancel()
+
           return
-
-        #request.get('http:' + url).set("Accept", "text/plain").end (error, res) =>
-          #console.log res
-          #fs.writeFile @selectedPath + "/" + eventDescription, res.text, 'utf8', (err) ->
-
-            #throw err  if err
-            #console.log "It's saved!"
-            #return
       else
         editor.insertText(url)
         @cancel()
