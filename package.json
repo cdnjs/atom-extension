@@ -1,5 +1,5 @@
 {
-  "name": "cdnjs",
+  "name": "cdnjs-atom-extension",
   "main": "./lib/cdnjs",
   "version": "1.5.0",
   "description": "Easily embed scripts from cdnjs",
