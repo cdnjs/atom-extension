@@ -1,4 +1,5 @@
 # cdnjs atom extension
+[![Dependency Status](https://david-dm.org/cdnjs/atom-extension.svg)](https://david-dm.org/cdnjs/atom-extension) 
 
 Quickly embed url's from the large collection of client side libraries at cdnjs.com
 
