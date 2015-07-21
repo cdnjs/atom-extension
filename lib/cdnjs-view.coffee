@@ -122,7 +122,7 @@ class CdnjsView extends SelectListView
       @setItems(files)
       @setLoading()
     else if eventName == 'file'
-      url = '//cdnjs.cloudflare.com/ajax/libs/' + @library.name + '/' + @libraryVersion + '/' + eventDescription
+      url = 'https://cdnjs.cloudflare.com/ajax/libs/' + @library.name + '/' + @libraryVersion + '/' + eventDescription
       if @action == 'download'
         filePath = eventDescription.split('/')
         filePath = filePath[filePath.length-1]
