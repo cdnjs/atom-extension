@@ -3,10 +3,10 @@
   "main": "./lib/cdnjs",
   "version": "1.5.0",
   "description": "Easily embed scripts from cdnjs",
-  "activationEvents": [
-    "cdnjs:GetUrl",
-    "cdnjs:DownloadFile"
-  ],
+  "activationCommands": {
+    "atom-text-editor": "cdnjs:GetUrl",
+    "atom-workspace": "cdnjs:DownloadFile"
+  },
   "repository": "https://github.com/cdnjs/atom-extension",
   "license": "MIT",
   "engines": {

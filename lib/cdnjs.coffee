@@ -1,18 +1,21 @@
 CdnjsView = require './cdnjs-view'
 request = require 'superagent'
+{CompositeDisposable} = require 'atom'
 
 module.exports =
   cdnjsView: null
 
   activate: (state) ->
     @cdnjsView = new CdnjsView(state.cdnjsViewState)
-    atom.commands.add "atom-workspace",
-      "cdnjs:convert": => @convert()
+    @subscriptions = new CompositeDisposable
+
+    @subscriptions.add atom.commands.add 'atom-workspace',
+      #"cdnjs:convert": => @convert()
       "cdnjs:GetUrl": => @GetUrl()
       "cdnjs:DownloadFile": => @DownloadFile()
-      "cdnjs:GetScriptTag": => @GetScriptTag()
-      "cdnjs:GetLinkTag": => @GetLinkTag()
-
+      #"cdnjs:GetScriptTag": => @GetScriptTag()
+      #"cdnjs:GetLinkTag": => @GetLinkTag()
+  
   url: ->
     @cdnjsView.toggle()
 
@@ -24,8 +27,8 @@ module.exports =
 
   GetLinkTag: ->
     @cdnjsView.toggle()
-  DownloadFile: ->
 
+  DownloadFile: ->
     @cdnjsView.toggle({action: 'download'})
 
   deactivate: ->
