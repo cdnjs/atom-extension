@@ -45,7 +45,7 @@ class CdnjsView extends SelectListView
 
       @setItems(events)
     else
-      request.get "http://api.cdnjs.com/libraries?atom".end (error, res) =>
+      request.get "http://api.cdnjs.com/libraries?atom", (error, res) =>
         if res.body.results
           libraries = res.body.results
           _.each libraries, (library) ->
@@ -122,12 +122,13 @@ class CdnjsView extends SelectListView
 
       assets = assets[0].files
       files = []
-      _.each assets, (file) ->
-        files.push {eventName: 'file', eventDescription: file.name}
+      _.each assets, (filename) ->
+        files.push {eventName: 'file', eventDescription: filename}
       @setItems(files)
       @setLoading()
     else if eventName == 'file'
-      url = 'https://cdnjs.cloudflare.com/ajax/libs/' + @library.name + '/' + @libraryVersion + '/' + eventDescription
+      url = '//cdnjs.cloudflare.com/ajax/libs/' + @library.name + '/' + @libraryVersion + '/' + eventDescription
+
       if @action == 'download'
         filePath = eventDescription.split('/')
         filePath = filePath[filePath.length-1]
@@ -137,7 +138,7 @@ class CdnjsView extends SelectListView
 
           # show notification
           atom.notifications.addSuccess 'library successfully downloaded',
-            detail: "#{@library.name} #{@libraryVersion}"
+            detail: "#{eventDescription} (#{@libraryVersion})"
 
           # close panel
           @cancel()
@@ -147,7 +148,7 @@ class CdnjsView extends SelectListView
         editor.insertText(url)
         @cancel()
     else
-      request.get "http://api.cdnjs.com/libraries/" + eventDescription.end (error, res) =>
+      request.get "http://api.cdnjs.com/libraries/" + eventDescription, (error, res) =>
 
         if res.body
           @library = res.body
