@@ -11,22 +11,11 @@ module.exports =
 
     @subscriptions.add atom.commands.add 'atom-workspace',
       #"cdnjs:convert": => @convert()
-      "cdnjs:GetUrl": => @GetUrl()
-      "cdnjs:DownloadFile": => @DownloadFile()
-      #"cdnjs:GetScriptTag": => @GetScriptTag()
-      #"cdnjs:GetLinkTag": => @GetLinkTag()
-  
-  url: ->
-    @cdnjsView.toggle()
+      "cdnjs:get-url": => @GetUrl()
+      "cdnjs:download-file": => @DownloadFile()
 
   GetUrl: ->
-    @cdnjsView.toggle()
-
-  GetScriptTag: ->
-    @cdnjsView.toggle()
-
-  GetLinkTag: ->
-    @cdnjsView.toggle()
+    @cdnjsView.toggle({action: 'url'})
 
   DownloadFile: ->
     @cdnjsView.toggle({action: 'download'})

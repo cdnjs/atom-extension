@@ -1,2 +1,7 @@
 'context-menu':
-  'atom-workspace': [{label: 'Download file from cdnjs', command: 'cdnjs:DownloadFile'}]
+  '.tree-view.full-menu': [
+  	{
+  		label: 'Download file from cdnjs',
+  		command: 'cdnjs:download-file'
+	}
+]

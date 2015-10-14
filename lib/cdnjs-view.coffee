@@ -1,10 +1,11 @@
 _ = require 'underscore-plus'
 fs = require 'fs'
-{$, $$, View, SelectListView} = require 'atom-space-pen-views'
 wget = require 'wget'
 path = require 'path'
-
+tmp = require 'tmp'
 request = require 'superagent'
+{$, $$, View, SelectListView} = require 'atom-space-pen-views'
+
 module.exports =
 class CdnjsView extends SelectListView
 
@@ -69,12 +70,25 @@ class CdnjsView extends SelectListView
 
   toggle: (options = {}) ->
 
+    @editor = atom.workspace.getActiveTextEditor()
     @action = options.action || ''
+    currentFilePath = @editor?.getPath()
+
     if @action == 'download'
       list = $('.tree-view-scroller')
       selectedEntry = list.find('.selected')[0]
+
+    if !@editor and !selectedEntry
+      @cancel()
+      return
+
+    if selectedEntry?
       entryEntity = selectedEntry.file || selectedEntry.directory
       @selectedPath = if selectedEntry.file then path.dirname(entryEntity.path) else entryEntity.path
+    else if currentFilePath
+      @selectedPath = path.dirname(currentFilePath)
+    else
+      @selectedPath = false
 
     if !@libraries
       @getLibraries()
@@ -112,8 +126,6 @@ class CdnjsView extends SelectListView
     @setLoading('Please wait...')
     @show()
 
-    editor = atom.workspace.getActiveTextEditor()
-
     if eventName == 'version'
       @libraryVersion = eventDescription
       assets = _.filter @library.assets, (asset) ->
@@ -132,23 +144,50 @@ class CdnjsView extends SelectListView
       if @action == 'download'
         filePath = eventDescription.split('/')
         filePath = filePath[filePath.length-1]
-        download = wget.download('http:' + url, @selectedPath + "/" + filePath, {})
+        tmpObject = false
+
+        if @selectedPath
+          outputPath = "#{@selectedPath}/#{filePath}"
+        #TODO: set allowed file extensions to download, show images on new tab.
+        else if path.extname(filePath) in ['.css', '.js', '.txt', '.csv', '.json']
+          tmpObject = tmp.fileSync()
+          outputPath = tmpObject.name
+        else
+          @cancel()
+          return
+
+        download = wget.download("http:#{url}", outputPath, {})
 
         download.on "end", (output) =>
 
           # show notification
+          detail = "#{eventDescription} (#{@libraryVersion})"
+
+          if !tmpObject
+            detail += "\n#{output}"
+
           atom.notifications.addSuccess 'library successfully downloaded',
-            detail: "#{eventDescription} (#{@libraryVersion})"
+            detail: detail
+
+          # check for tmp file
+          if tmpObject
+            fs.readFile output, 'utf-8', (err, data) =>
+              if err
+                throw err
+
+              # insert asset content on editor and cleanup
+              @editor.insertText(data)
+              tmpObject.removeCallback()
 
           # close panel
           @cancel()
 
           return
       else
-        editor.insertText(url)
+        @editor.insertText(url)
         @cancel()
     else
-      request.get "http://api.cdnjs.com/libraries/" + eventDescription, (error, res) =>
+      request.get "http://api.cdnjs.com/libraries/#{eventDescription}", (error, res) =>
 
         if res.body
           @library = res.body
