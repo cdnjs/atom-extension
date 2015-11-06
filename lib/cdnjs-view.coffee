@@ -42,11 +42,21 @@ class CdnjsView extends SelectListView
           eventDescription: library.name
           eventName: library.latest
 
-        return
-
       @setItems(events)
     else
       request.get "http://api.cdnjs.com/libraries?atom", (error, res) =>
+        # handle error on api request
+        if error
+          # show error
+          atom.notifications.addError 'An error has ocurred',
+            detail: "error getting libraries list, please try again later"
+            dismissable: true
+
+          # close panel
+          @cancel()
+
+          return
+
         if res.body.results
           libraries = res.body.results
           _.each libraries, (library) ->
@@ -54,16 +64,11 @@ class CdnjsView extends SelectListView
               eventDescription: library.name
               eventName: library.latest
 
-            return
-
           @setItems(events)
           @libraries = events
-        else
-          #throw error
-
-        return
 
   serialize: ->
+    # pass
 
   getFilterKey: ->
     'eventDescription'
@@ -158,8 +163,16 @@ class CdnjsView extends SelectListView
 
         download = wget.download("http:#{url}", outputPath, {})
 
-        download.on "end", (output) =>
+        # handle download error
+        download.on "error", () =>
+          atom.notifications.addError 'An error has ocurred',
+            detail: "error downloading library, please try again later"
+            dismissable: true
 
+          # close panel
+          @cancel()
+
+        download.on "end", (output) =>
           # show notification
           detail = "#{eventDescription} (#{@libraryVersion})"
 
@@ -168,6 +181,8 @@ class CdnjsView extends SelectListView
 
           atom.notifications.addSuccess 'library successfully downloaded',
             detail: detail
+            dismissable: true
+            icon: "cloud-download"
 
           # check for tmp file
           if tmpObject
@@ -181,13 +196,22 @@ class CdnjsView extends SelectListView
 
           # close panel
           @cancel()
-
-          return
       else
         @editor.insertText(url)
         @cancel()
     else
       request.get "http://api.cdnjs.com/libraries/#{eventDescription}", (error, res) =>
+        # handle error on api request
+        if error
+          # show error message
+          atom.notifications.addError 'An error has ocurred',
+            detail: "error getting library assets, please try again later"
+            dismissable: true
+
+          # close panel
+          @cancel()
+
+          return
 
         if res.body
           @library = res.body
@@ -198,13 +222,5 @@ class CdnjsView extends SelectListView
               eventDescription: asset.version
               eventName: 'version'
 
-            return
-
           @setItems(versions)
           @setLoading()
-
-        else
-          #throw error
-
-        return
-    #@eventElement.trigger(eventName)
