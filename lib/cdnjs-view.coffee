@@ -44,7 +44,7 @@ class CdnjsView extends SelectListView
 
       @setItems(events)
     else
-      request.get "http://api.cdnjs.com/libraries?atom", (error, res) =>
+      request.get "https://api.cdnjs.com/libraries?atom", (error, res) =>
         # handle error on api request
         if error
           # show error
@@ -200,7 +200,7 @@ class CdnjsView extends SelectListView
         @editor.insertText(url)
         @cancel()
     else
-      request.get "http://api.cdnjs.com/libraries/#{eventDescription}", (error, res) =>
+      request.get "https://api.cdnjs.com/libraries/#{eventDescription}", (error, res) =>
         # handle error on api request
         if error
           # show error message
