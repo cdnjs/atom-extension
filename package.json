@@ -1,7 +1,7 @@
 {
-  "name": "cdnjs-atom-extension",
+  "name": "cdnjs",
   "main": "./lib/cdnjs",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Easily embed scripts from cdnjs",
   "activationCommands": {
     "atom-text-editor": "cdnjs:get-url",
