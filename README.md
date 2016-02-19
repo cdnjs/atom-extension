@@ -1,6 +1,12 @@
 # CDNJS for ATOM
 [![Dependency Status](https://david-dm.org/cdnjs/atom-extension.svg)](https://david-dm.org/cdnjs/atom-extension)
 
+### Getting started
+
+`apm install cdnjs`
+
+or visit https://atom.io/packages/cdnjs
+
 Quickly embed url's from the large collection of client side libraries available at cdnjs.com
 
 Simply bring up the command window (ctrl+shift+p) and type cdnjs to run the GetUrl method
