@@ -16,7 +16,7 @@
     "superagent": "^1.2.0",
     "underscore-plus": "^1.2.1",
     "wget": "0.0.1",
-    "tmp": "0.0.28",
+    "tmp": "0.0.29",
     "atom-space-pen-views": "^2.0.3"
   }
 }
