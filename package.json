@@ -13,7 +13,7 @@
     "atom": ">=1.0.0"
   },
   "dependencies": {
-    "superagent": "^2.2.0",
+    "superagent": "^2.3.0",
     "underscore-plus": "^1.2.1",
     "wget": "0.0.1",
     "tmp": "0.0.28",
